@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+set -e
+
+export API_KEY=<see-github-api-tokens>
+export USER=centiq
+export REPO=optiq
+export REFERENCE=master
+
+# Valdiate the options are passed into the docker 
+
+# Create the directory structure
+mkdir -p /var/meteor/{source,build,tmp}
+
+#Build the download link for the source
+# https://api.github.com/repos/$USER/$REPO/tarball/$REFERENCE
+# Clone the git repository
+echo "Downloading $REPO:$REFERENCE"
+curl -o /var/meteor/tmp/source.tar.gz -J -L -u $API_KEY:x-oauth-basic https://api.github.com/repos/$USER/$REPO/tarball/$REFERENCE
+
+echo "Extracting"
+tar xzf var/meteor/tmp/source.tar.gz -C var/meteor/source
+
+# Use stable
+nvm use stable
+
+# Start the server
+PORT=3000 npm start
